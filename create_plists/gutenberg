@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+import sys
+from urllib2 import *
+from bs4 import BeautifulSoup as Soup
+
+class GetFiles:
+    def __call__(self, Min, Max):
+        for x in xrange(Min, Max+1):
+            sys.stderr.write('book #%s\n' % x)
+            page = self.getPage(x)
+            tags = self._get_filtered_tags(page)
+            self._print_text(tags)
+
+    def _print_text(self, children):
+        for child in children:
+            tmp = child.find(text=True)
+            if tmp != None and 'function()' not in tmp:
+                for word in tmp.lower().split(' '):
+                    if len(word) > 1:
+                        try:sys.stdout.write('%s\n' % word)
+                        except:pass
+
+    def _get_filtered_tags(self, item):
+        children = item.findChildren()
+        for child in children:
+            if child.name == 'head': pass
+            elif child.name == 'html': pass
+            elif child.name == 'style': pass
+            elif child.name == 'meta': pass
+            elif child.name == 'script': pass
+            else:yield child
+
+    def getPage(self, number):
+        url = 'http://www.gutenberg.org/cache/epub/%s/pg%s.txt' % (number, number)
+        opener = build_opener()
+        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+        response = opener.open(str(url))
+        return Soup(response.read())
+
+if __name__=='__main__':
+    try:
+        test = GetFiles()
+        test(int(sys.argv[1]), int(sys.argv[2]))
+    except IndexError:
+        print '\n\tUsage: gutenberg.py   < 1 - 29999 >   < 1 - 29999 >'
+        print '\n\tDescription: This program grabs books from gutenberg.org'
+        print '\t\t     and prints them one word at a time on the command line'
+        print '\n\n\t\tArg 1: Is the book the scraper will start at'
+        print '\t\tArg 2: Is the book the scraper will end at\n'

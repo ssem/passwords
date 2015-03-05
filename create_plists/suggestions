@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+import os
+import sys
+import random
+from urllib2 import *
+
+class GetFiles:
+    def __init__(self, port=80, proxy=False):
+        self.port = port
+        self.proxy = proxy
+
+    def __call__(self, dictionary):
+        totalFoundItems = 0
+        words = self.loadDictionary(dictionary)
+        self.suggestions(words)
+
+    def suggestions(self, words):
+        for x in xrange(len(words)):
+            searchString = self.makeSearchString(words, x)
+            page = self.getPage(searchString)
+            foundItems = self.filterPage(page)
+            for item in foundItems:
+                print item
+
+    def filterPage(self, page):
+        foundItems = []
+        try:
+            for item in page.split('><'):
+                if 'suggestion data' in item:
+                    foundItems.append(item.split('=')[1].lstrip('"').rstrip('"/'))
+        except:pass
+        return foundItems
+
+    def getPage(self, searchString):
+        url = 'https://clients1.google.com/complete/search?output=toolbar&hl=en&q='
+        url = url + searchString
+        response = self.getResponse(url)
+        return self.getPageFromResponse(response)
+
+    def loadDictionary(self, dictionary):
+        words = []
+        f = open(dictionary, 'r')
+        for item in f:
+            words.append(item)
+        f.close()
+        if len(words) < 1:
+            print '\n\tUsage: findFiles.py   < path to dictionary>\n'
+            exit()
+        return words
+
+    def makeSearchString(self, words, index):
+        searchString = words[index].rstrip('\r\n') + '%20'
+        searchString += words[random.randrange(1,len(words))].rstrip('\r\n')
+        return searchString
+
+    def getResponse(self, url):
+        try:
+            if self.proxy:
+                proxy = ProxyHandler({'http': self.proxy})
+                opener = build_opener(proxy)
+            else:opener = build_opener()
+            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+            return opener.open(str(url))
+        except Exception:return None
+    def getHeaderFromResponse(self, response):
+        try:return str(response.info())
+        except: return None
+    def getUrlFromResponse(self, response):
+        try:return str(response.geturl())
+        except: return None
+    def getPageFromResponse(self, response):
+        try:return str(response.read())
+        except: return None
+
+if __name__=='__main__':
+    try:
+        test = GetFiles()
+        test(sys.argv[1])
+    except IndexError:
+        print '\n\tUsage: suggestions.py   < path to dictionary>'
+        print '\n\tDescription: This program takes in a dictionary file and'
+        print '\t\t     creates a new one using googles suggestions\n'

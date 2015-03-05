@@ -1,0 +1,11 @@
+#!/bin/bash
+
+FILTER=a-zA-Z0-9"!@#$%^&*()_+{}|:<>?=[[]]\\;,./"
+
+if [ -z "$1" ]
+then
+    echo -e "\n\t./genpassword < length >\n"
+else
+    tr -dc ${FILTER} < /dev/urandom | head -c "$1"
+    echo ""
+fi

@@ -1,0 +1,4 @@
+run the following command to add this project to your
+python path and add /bin to you shell path
+
+source setup_env

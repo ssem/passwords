@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+
+import requests
+
+http = requests.get("http://www.beeradvocate.com/lists/top/")
+for x in http.content.split('<b>'):
+    if 'href="/beer/profile/' in x and 'ABV' in x:
+        print x.split('</b>')[0]
+

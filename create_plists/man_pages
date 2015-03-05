@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for page in `man -k . | cut -d " " -f 1`;
+do
+    man $page 2> /dev/null | tr " " "\n" 2> /dev/null | sort 2> /dev/null | uniq 2> /dev/null
+done

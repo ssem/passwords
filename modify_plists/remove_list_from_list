@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ -z  "$1" ]]
+then
+    printf "\n\tUsage: < word list> < word list >\n\n"
+else
+    grep -F -v -f $1 -w $2
+fi

@@ -1,0 +1,35 @@
+#!/bin/bash
+
+
+if [[ -z  "$1" ]]
+then
+    printf "\n\tUsage: < input file >\n\n"
+else
+    cat $@ | egrep -o '\b4[0-9]{3}[ -]?[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{1}[0-9]{3}?\b' >> visa.txt
+    cat $@ | egrep -o '\b5[1-5][0-9]{2}[ -]?[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}\b' >> mastercard.txt
+    cat $@ | egrep -o '\b3[47][0-9]{2}[ -]?[0-9]{6}[ -]?[0-9]{5}\b' >> americal-express.txt
+    cat $@ | egrep -o '\b3(0[0-5]|[68][0-9])[0-9]{1}[0-9]{6}[0-9]{4}\b' >> diners_club.txt
+    cat $@ | egrep -o '\b6(011|5[0-9]{2})[ -]?[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{4}\b' >> discover.txt
+    cat $@ | egrep -o '\b(2131|1800|35[0-9]{2})[ -]?[0-9]{4}[ -]?[0-9]{4}[ -]?[0-9]{3,4}\b' >> jcb.txt
+    cat $@ | egrep -o '\b[0-9]{3}[ -]{1}[0-9]{2}[ -]{1}[0-9]{4}\b' > ssn.txt
+    cat $@ | egrep -o '\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b' >> email.txt
+
+    #cat $@ | egrep -o '(^|[^a-fA-F0-9])[a-fA-F0-9]{32}(1|$)' | egrep -o '[a-fA-F0-9]{32}'
+    #cat $@ | egrep -o '[0-7][0-9a-f]{7}[0-7][0-9a-f]{7}' > mysql-old-hashes.txt
+    #cat $@ | egrep -o '$2a$8$(.){75}' > blowfish-hashes.txt
+    #cat $@ | egrep -o '([0-9a-zA-Z]{32}):(w{16,32})' > joomla.txt
+    #cat $@ | egrep -o '([0-9a-zA-Z]{32}):(S{3,32})' > vbulletin.txt
+    #cat $@ | egrep -o '$H$S{31}' > phpBB3-md5.txt
+    #cat $@ | egrep -o '$P$S{31}' > wordpress-md5.txt
+    #cat $@ | egrep -o '$S$S{52}' > drupal-7.txt
+    #cat $@ | egrep -o '$1$w{8}S{22}' > md5-unix-old.txt
+    #cat $@ | egrep -o '$apr1$w{8}S{22}' > md5-apr1.txt
+    #cat $@ | egrep -o '$6$w{8}S{86}' > sha512crypt.txt
+    #cat $@ | egrep -o 'http' | grep -shoP 'http.*?[" >]' > http-urls.txt
+    #cat $@ | egrep -o '(((https|ftp|gopher)|mailto)[.:][^ >"  ]*|www.[-a-z0-9.]+)[^ .,;   >">):]' > urls.txt
+    #cat $@ | egrep -o '[0-9]{4}[ -]?[0-9]{2}[ -]?[0-9]{4}' > indiana-dln.txt
+    #cat $@ | egrep -o 'C0[0-9]{7}' > us-pass-card.txt
+    #cat $@ | egrep -o '[23][0-9]{8}' > us-pass-num.txt
+    #cat $@ | egrep -o 'd{3}[s-_]?d{3}[s-_]?d{4}' > us-phones.txt
+    ##cat $@ | egrep -o ISBN(?:-1[03])?:? (?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X" > isbn.txt
+f

@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+import sys
+
+class Parse:
+
+    def from_stdin(self, dictionary):
+        for line in sys.stdin:
+            for key in dictionary:
+                line = line.replace(key, dictionary[key])
+                print line.rstrip('\r\n')
+
+    def from_file(self, word_list, dictionary):
+        f = open(word_list, 'r')
+        for line in f:
+            for key in dictionary:
+                line = line.replace(key, dictionary[key])
+                print line.rstrip('\r\n')
+        f.close()
+
+def _help():
+    print "\n\tUsage:   replace.py    -i   {' ':'12345'}"
+    print "\tUsage:   replace.py   < word list >   {' ':'12345'.'bob':'tom'}"
+    print "\tNote:   {' '.' '} not {' ',' '}\n"
+    print "\tDescription: This program takes in put from a word list or"
+    print "\t\t     stadin and replaces all instances of a key with it's"
+    print "\t\t     value pair\n"
+    print "\t\tArg 1: Url of the site you would like to parse"
+    print "\t\tArg 2: Dictionary of key value pairs\n"
+
+if __name__ == '__main__':
+    try:
+        parse = Parse()
+        if sys.argv[1] == '-h' or sys.argv[1] == '--help':
+            _help()
+            exit()
+        a = sys.argv[2]
+        a = a.replace('{', "{'")
+        a = a.replace(':', "':'")
+        a = a.replace('}', "'}")
+        a = a.replace('.', "','")
+        if sys.argv[1] == '-i':
+            parse.from_stdin(eval(a))
+        else:
+            parse.from_file(sys.argv[1], eval(a))
+    except IndexError:
+        _help()

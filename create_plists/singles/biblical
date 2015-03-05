@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+import requests
+
+http = requests.get('http://chafer-cstn.org/BaseT/Glossary.htm')
+for x in http.content.split('\n'):
+    if '><a name="' in x:
+        print x.split('<a name="')[1].split('">')[0]

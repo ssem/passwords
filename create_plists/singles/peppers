@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+import requests
+
+http = requests.get("http://www.cayennediane.com/BigListofPeppers/Big-List-of-peppers.html")
+for x in http.content.split('\n'):
+    if 'F9C61A' in x:
+        print x.split(' ">')[1].split('</')[0]

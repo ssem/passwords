@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+import os
+import sys
+import rec
+import argparse
+
+
+def add_to_spell_check(mylist):
+    output = open(os.path.dirname(rec.__file__) + '/spell_check.txt', 'a')
+    for word in mylist:
+        output.write(word)
+
+if __name__ == '__main__':
+    if not sys.stdin.isatty():
+        f = sys.stdin
+    else:
+        parse = argparse.ArgumentParser()
+        parse.add_argument('file', help="password file")
+        args = parse.parse_args()
+        f = open(args.file, 'r')
+    add_to_spell_check(f)

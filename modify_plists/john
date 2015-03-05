@@ -1,0 +1,10 @@
+#!/bin/bash
+
+JOHN=~/tools/john/john
+
+if [[ -z  "$1" ]]
+then
+    printf "\n\tUsage: < word list>\n\n"
+else
+    $JOHN --wordlist=$1 --rules --stdout=36
+fi

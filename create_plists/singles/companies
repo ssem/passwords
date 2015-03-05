@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+
+import requests
+
+http = requests.get("http://www.greatplacetowork.com/best-companies/100-best-companies-to-work-for")
+for x in http.content.split('\r\n'):
+    if 'font-size: 16px;">' in x:
+        print x.split('16px;">')[1].split('. ')[1]

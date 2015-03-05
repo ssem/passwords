@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+
+import requests
+
+http = requests.get('http://www.trancetop1000.com/TranceTop1000-2013.html')
+for x in http.content.split('\n'):
+    if '.' in x and '<br />' in x:
+        print x.split('.')[1].split('-')[0].split(';')[0].rstrip(' ').lstrip(' ')
+

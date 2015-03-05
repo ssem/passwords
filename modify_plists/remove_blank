@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ -z  "$1" ]]
+then
+    printf "\n\tUsage: < word list>\n\n"
+else
+    sed -i '/^$/d' $1
+fi

@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+
+import requests
+
+http = requests.get('http://www.modernlibrary.com/top-100/100-best-novels/')
+for x in http.content.split('<a href'):
+    if 'randomhouse.com/catalog' in x and 'ong>' in x:
+        print x.split('ong>')[1].split('</')[0].lower()

@@ -1,0 +1,2 @@
+#!/bin/bash
+curl http://www.ccel.org/ccel/bible/kjv.txt | tr " " "\n" | sort | uniq

@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+import argparse
+from enigma.machine import EnigmaMachine
+
+
+def enigma(rotors, reflector, ring_settings, plugboard, start_key, msg_key, fname):
+    for line in open(fname, 'r'):
+        line = line.rstrip('\r\n')
+        machine = EnigmaMachine.from_key_sheet(rotors,ring_settings,reflector,plugboard)
+        machine.set_display(start_key)
+        new_key = machine.process_text(msg_key)
+        machine.set_display(new_key)
+        print machine.process_text(line)
+
+
+if __name__ == '__main__':
+    parse = argparse.ArgumentParser()
+    parse.add_argument('file', help='file to modify')
+    parse.add_argument('--rot', help='rotors (DEFAULT: "II IV V")', default='II IV V')
+    parse.add_argument('--refl', help='reflector (DEFAULT: "B")', default='B')
+    parse.add_argument('--ring', help='ring settings (DEFAULT: "1,20,11")', default='1,20,11')
+    parse.add_argument('--plug', help='plug board (DEFAULT: "AV BS CG DL FU HZ IN KM OW RX")',
+        default='AV BS CG DL FU HZ IN KM OW RX')
+    parse.add_argument('--start_key', help='start key (DEFAULT: "WXC")', default='WXC')
+    parse.add_argument('--msg_key', help='message key (DEFAULT: "KCH")', default='KCH')
+    args = parse.parse_args()
+    ring = []
+    for x in args.ring.split(','):
+        ring.append(int(x))
+    enigma(args.rot, args.refl, ring, args.plug, args.start_key, args.msg_key, args.file)

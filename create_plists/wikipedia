@@ -1,0 +1,125 @@
+#!/usr/bin/env python
+
+import sys
+import urllib2
+from bs4 import BeautifulSoup as Soup
+
+USER_AGENT = 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.22 \228(KHTML, like\
+Gecko) Ubuntu Chromium/25.0.1364.160 Chrome/25.0.1364.160 \1609Safari/537.22'
+
+
+def urlopen(url):
+    opener = urllib2.build_opener()
+    opener.addheaders = [('User-Agent', USER_AGENT)]
+    return opener.open(url)
+
+class Parse:
+    def __init__(self, max_length = 64):
+        self.valid = []
+        self.replace = {}
+        self._max_length = max_length
+
+    def __call__(self, search_item, replace = {}):
+        url = 'http://en.wikipedia.org/wiki/'+search_item
+        self.replace = replace
+        try:
+            try:page = Soup(urlopen(url))
+            except ValueError: page = Soup(urlopen('http://'+url))
+        except urllib2.HTTPError:
+            sys.stderr.write('did not find a result for %s\n' % search_item)
+            return
+        tags = self._get_filtered_tags(page)
+        text = list(set(self._find_text(tags)))
+        self._create_words(text)
+        self._print()
+
+    def _print(self):
+        for word in sorted(list(set(self.valid))):
+            try:
+                if self.replace == {}:
+                    print word
+                else:
+                    for key in self.replace:
+                        word = word.replace(str(key), str(self.replace[key]))
+                    print word
+            except:
+                pass
+
+    def _create_words(self, text):
+        for line in text:
+            if ' ' in line:
+                words = line.split(' ')
+                for word in words:
+                    compound = ''
+                    for compounds in words[words.index(word):]:
+                        compound += compounds + ' '
+                        if len(compound) < self._max_length:
+                            self.valid.append(compound)
+            else:
+                self.valid.append(line[:16])
+
+    def _find_text(self, children):
+        valid = []
+        for child in children:
+            tmp = child.find(text=True)
+            if tmp != None and 'function()' not in tmp:
+                if tmp not in valid: valid.append(tmp.lower())
+        return valid
+
+    def _get_filtered_tags(self, item):
+        valid = []
+        children = item.findChildren()
+        for child in children:
+            if child.name == 'head': pass
+            elif child.name == 'html': pass
+            elif child.name == 'style': pass
+            elif child.name == 'meta': pass
+            elif child.name == 'script': pass
+            else: valid.append(child)
+        return valid
+
+def _help():
+    print "\n\tUsage:  wikipedia.py  < search item >"
+    print "\tUsage:  wikipedia.py  < search item >  {' ':'12345'}"
+    print "\tUsage:  wikipedia.py  < search item >  {' ':'1'.'youtube':zoutube}"
+    print "\tNote:   {' '.' '} not {' ',' '}"
+    print "\tNote:   if search item is two or more words replace"
+    print "\t        spaces with underscore\n"
+    print "\tOptions:"
+    print "\t\t-f: Use a file rather then a search word\n"
+    print "\tDescription: This program goes through a webpage and trys"
+    print "\t\t     to grab the text of a webpage without any html tags"
+    print "\t\t     it then prints the text one word at a time on the"
+    print "\t\t     commandline\n"
+    print "\t\tArg 1: Search item you would like to find in wikipedia"
+    print "\t\t       Example Tonka"
+    print "\t\tArg 2: You can pass an optional dictionary to the program"
+    print "\t\t       and the program will replace all instances of the key"
+    print "\t\t       with the value pair.\n"
+
+
+if __name__ == '__main__':
+    try:
+        if sys.argv[1] == '-h' or sys.argv[1] == '--help':
+            _help()
+        elif sys.argv[1] == '-f':
+            parse = Parse()
+            f = open(sys.argv[2], 'r+')
+            for line in f:
+                parse(line.rstrip('\r\n'))
+        else:
+            parse = Parse()
+            a = sys.argv[2]
+            a = a.replace('{', "{'")
+            a = a.replace(':', "':'")
+            a = a.replace('}', "'}")
+            a = a.replace('.', "','")
+            parse(sys.argv[1], eval(a))
+    except IndexError:
+        try:
+            parse = Parse()
+            parse(sys.argv[1])
+        except IndexError:
+            _help()
+
+
