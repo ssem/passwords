@@ -4,7 +4,6 @@ import sys
 import rec
 import enchant
 import argparse
-import threading
 from rec.basewords import Find_Basewords
 from rec.chars import Find_Chars
 from rec.sets import Find_Sets
@@ -18,12 +17,6 @@ from rec.suffixes import Find_Suffixes
 from rec.time_and_patterns import Find_Time_And_Patterns
 from rec.top_passwords import Find_Top_Passwords
 from rec.years import Find_Years
-
-def start_thread(func, args):
-    p = threading.Thread(target=func, args=args)
-    p.daemon = True
-    p.start()
-    return p
 
 def run(f, count):
     d = enchant.DictWithPWL("en", os.path.dirname(rec.__file__) + '/spell_check.txt')
@@ -40,37 +33,22 @@ def run(f, count):
     ti = Find_Time_And_Patterns()
     to = Find_Top_Passwords()
     ye = Find_Years()
-    array = []
-    for line in f:
-        array.append(line)
-    try:f.close()
-    except:pass
-    t1 = start_thread(ba.parse_list, [array])
-    t2 = start_thread(ch.parse_list, [array])
-    t3 = start_thread(se.parse_list, [array])
-    t4 = start_thread(co.parse_list, [array])
-    t5 = start_thread(en.parse_list, [array])
-    t6 = start_thread(le.parse_list, [array])
-    t7 = start_thread(pa.parse_list, [array])
-    t8 = start_thread(ti.parse_list, [array])
-    t9 = start_thread(to.parse_list, [array])
-    t10 = start_thread(ye.parse_list, [array])
-    #t11 = start_thread(mo.parse_list, [array])
-    #t12 = start_thread(pr.parse_list, [array])
-    #t13 = start_thread(su.parse_list, [array])
-    t1.join()
-    t2.join()
-    t3.join()
-    t4.join()
-    t5.join()
-    t6.join()
-    t7.join()
-    t8.join()
-    t9.join()
-    t10.join()
-    #t11.join()
-    #t12.join()
-    #t13.join()
+    for word in f:
+        word = word.rstrip('\r\n')
+        ba.parse_word(word)
+        ch.parse_word(word)
+        se.parse_word(word)
+        co.parse_word(word)
+        en.parse_word(word)
+        le.parse_word(word)
+        pa.parse_word(word)
+        ti.parse_word(word)
+        to.parse_word(word)
+        ye.parse_word(word)
+        for baseword in d.suggest(word)[:2]:
+            mo.parse_word(word, baseword)
+            pr.parse_word(word, baseword)
+            su.parse_word(word, baseword)
     print '\nCOMPLEXITY:'
     co.print_data(count)
     print '\nCHAR:'
@@ -106,7 +84,6 @@ def run(f, count):
     to.print_data(count)
 
 if __name__ == '__main__':
-    print "\nwork in progress\n"
     if not sys.stdin.isatty():
         f = sys.stdin
         count = 10

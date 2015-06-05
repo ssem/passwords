@@ -37,4 +37,5 @@ class Find_Time_And_Patterns():
         for data in self.return_data():
             counter += 1
             if counter < count:
-                print '{:<50}{:<10}{:<10}'.format(data[1][0], data[1][1], data[1][2])
+                pattern = '%s (%s)' % (data[1][0], (len(data[1][0]) / 2))
+                print '{:<40}{:<10}{:<10}'.format(pattern, data[1][1], data[1][2])

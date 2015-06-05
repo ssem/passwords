@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import time
 import argparse
 import operator
 from rec.time_and_patterns import Find_Time_And_Patterns
@@ -9,7 +10,7 @@ if __name__ == '__main__':
         f = sys.stdin
         min = 0
         max = 100
-        count = 1000000
+        count = 25
         if '-c' in sys.argv or '--count' in sys.argv:
             try:count = int(sys.argv[sys.argv.index('-c') + 1])
             except:pass
@@ -24,7 +25,7 @@ if __name__ == '__main__':
     else:
         parse = argparse.ArgumentParser()
         parse.add_argument('file', help="password file")
-        parse.add_argument('-c', '--count', default=1000000, help="# of items to print")
+        parse.add_argument('-c', '--count', default=25, help="# of items to print")
         parse.add_argument('--min', default=0, help="min length of pattern")
         parse.add_argument('--max', default=100, help="max length of pattern")
         args = parse.parse_args()
@@ -33,5 +34,7 @@ if __name__ == '__main__':
         max = int(args.max)
         count = int(args.count)
     gp = Find_Time_And_Patterns(int(min) * 2, int(max) * 2)
+    start = time.time()
     gp.parse_list(f)
     gp.print_data(int(count))
+    print '\n%s' % (time.time() - start)
