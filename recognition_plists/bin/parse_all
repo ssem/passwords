@@ -144,7 +144,7 @@ class Recognition:
         self.su.print_html(count)
         self._print_html_title('OVERALL ENTROPY', 'SCALE', '')
         try:entropy=float(self.en.total_save)/float(self.en.total)
-        except:extropy=0
+        except:entropy=0
         print '<tr>\n\t<td>%s</td>\n\t<td>%s</td>\n</tr>' % (entropy, 'pattern(0) - random(1)')
         self._print_html_title('ENTROPY')
         self.en.print_html(count)
