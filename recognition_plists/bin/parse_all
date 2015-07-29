@@ -18,70 +18,142 @@ from rec.time_and_patterns import Find_Time_And_Patterns
 from rec.top_passwords import Find_Top_Passwords
 from rec.years import Find_Years
 
-def run(f, count):
-    d = enchant.DictWithPWL("en", os.path.dirname(rec.__file__) + '/spell_check.txt')
-    ba = Find_Basewords()
-    ch = Find_Chars()
-    se = Find_Sets()
-    co = Find_Complexity()
-    en = Find_Entropy()
-    le = Find_Lengths()
-    mo = Find_Mods()
-    pa = Find_Patterns()
-    pr = Find_Prefixes()
-    su = Find_Suffixes()
-    ti = Find_Time_And_Patterns()
-    to = Find_Top_Passwords()
-    ye = Find_Years()
-    for word in f:
-        word = word.rstrip('\r\n')
-        ba.parse_word(word)
-        ch.parse_word(word)
-        se.parse_word(word)
-        co.parse_word(word)
-        en.parse_word(word)
-        le.parse_word(word)
-        pa.parse_word(word)
-        ti.parse_word(word)
-        to.parse_word(word)
-        ye.parse_word(word)
-        for baseword in d.suggest(word)[:2]:
-            mo.parse_word(word, baseword)
-            pr.parse_word(word, baseword)
-            su.parse_word(word, baseword)
-    print '\nCOMPLEXITY:'
-    co.print_data(count)
-    print '\nCHAR:'
-    ch.print_data(count)
-    print '\nALL CHARS:'
-    chars = ''
-    for item in ch.return_data():
-        chars += item[0]
-    print chars
-    print '\nSETS:'
-    se.print_data(count)
-    print '\nLENGTHS:'
-    le.print_data(count)
-    print '\nPATTERNS:'
-    pa.print_data(count)
-    print '\nTIME_AND_PATTERNS:'
-    ti.print_data(count)
-    print '\nBASE WORDS:'
-    ba.print_data(count)
-    print '\nMODS:'
-    mo.print_data(count)
-    print '\nPREFIXES:'
-    pr.print_data(count)
-    print '\nSUFFIXES:'
-    su.print_data(count)
-    print '\nOVERALL_ENTROPY:'
-    print '{:<50}{:<10}'.format(en.total_save/en.total, 'pattern(0) - random(1)')
-    print '\nENTROPY:'
-    en.print_data(count)
-    print '\nYEARS:'
-    ye.print_data(count)
-    print '\nTOP PASSWORDS:'
-    to.print_data(count)
+class Recognition:
+    def __init__(self):
+        try:
+            self.d = enchant.DictWithPWL("en", os.path.dirname(rec.__file__) + '/spell_check.txt')
+        except:
+            exit('\n\tsudo is required to read site-packages/recognition/rec/spell_check.txt\n')
+        self.ba = Find_Basewords()
+        self.ch = Find_Chars()
+        self.se = Find_Sets()
+        self.co = Find_Complexity()
+        self.en = Find_Entropy()
+        self.le = Find_Lengths()
+        self.mo = Find_Mods()
+        self.pa = Find_Patterns()
+        self.pr = Find_Prefixes()
+        self.su = Find_Suffixes()
+        self.ti = Find_Time_And_Patterns()
+        self.to = Find_Top_Passwords()
+        self.ye = Find_Years()
+
+    def run(self, f, count):
+        total = 100
+        for line in f:
+            total += 1
+        progress_bar_size = total/100
+        status = 0
+        f.seek(0)
+        sys.stderr.write('\b' * 1000 + '|{:<50}|0%'.format((status/progress_bar_size)*'#'))
+        for word in f:
+            status += 1
+            if (status % progress_bar_size) == 0:
+                percent = status/progress_bar_size
+                sys.stderr.write('\b' * 1000 + '|{:<50}|{:.0f}%'.format('#'*(percent/2), percent))
+            word = word.rstrip('\r\n')
+            self.ba.parse_word(word)
+            self.ch.parse_word(word)
+            self.se.parse_word(word)
+            self.co.parse_word(word)
+            self.en.parse_word(word)
+            self.le.parse_word(word)
+            self.pa.parse_word(word)
+            self.ti.parse_word(word)
+            self.to.parse_word(word)
+            self.ye.parse_word(word)
+            for baseword in self.d.suggest(word)[:2]:
+                self.mo.parse_word(word, baseword)
+                self.pr.parse_word(word, baseword)
+                self.su.parse_word(word, baseword)
+
+    def _print_commandline_title(self, title, first="FOUND", second="PERCENT"):
+        print '\n\033[1;32m{:<50}{:<10}{:<10}\033[1;m'.format(title, first, second)
+
+    def print_commandline(self):
+        self._print_commandline_title('COMPLEXITY')
+        self.co.print_data(count)
+        self._print_commandline_title('ALL CHARS', '', '')
+        chars = ''
+        for item in self.ch.return_data():
+            chars += item[0]
+        print chars
+        self._print_commandline_title('POPULAR CHARS')
+        self.ch.print_data(count)
+        self._print_commandline_title('SETS')
+        self.se.print_data(count)
+        self._print_commandline_title('LENGTHS')
+        self.le.print_data(count)
+        self._print_commandline_title('PATTERNS')
+        self.pa.print_data(count)
+        self._print_commandline_title('TIME AND PATTERNS', 'FOUND', 'SUBSET SIZE')
+        self.ti.print_data(count)
+        self._print_commandline_title('BASE WORDS')
+        self.ba.print_data(count)
+        self._print_commandline_title('MODS')
+        self.mo.print_data(count)
+        self._print_commandline_title('PREFIXES')
+        self.pr.print_data(count)
+        self._print_commandline_title('SUFFIXES')
+        self.su.print_data(count)
+        self._print_commandline_title('OVERALL ENTROPY', 'SCALE', '')
+        try:entropy=float(self.en.total_save)/float(self.en.total)
+        except:entropy=0
+        print '{:<50}{:<10}'.format(entropy, 'pattern(0) - random(1)')
+        self._print_commandline_title('ENTROPY')
+        self.en.print_data(count)
+        self._print_commandline_title('YEARS')
+        self.ye.print_data(count)
+        self._print_commandline_title('TOP PASSWORDS')
+        self.to.print_data(count)
+
+    def _print_html_title(self, title, first='FOUND', second='PERCENT'):
+        print '<tr><td>&nbsp;</td></tr>'
+        print '<tr>'
+        print '\t<td style="color:#00FE00">%s</td>' % title
+        print '\t<td style="color:#00FE00">%s</td>' % first
+        print '\t<td style="color:#00FE00">%s</td>' % second
+        print '</tr>'
+
+    def print_html(self):
+        print '<table>'
+        self._print_html_title('COMPLEXITY')
+        self.co.print_html(count)
+        self._print_html_title('ALL CHARS', '', '')
+        chars = ''
+        for item in self.ch.return_data():
+            chars += item[0]
+        print '<tr>\n\t<td>%s</td>\n</tr>' % chars
+        self._print_html_title('POPULAR CHARS')
+        self.ch.print_html(count)
+        self._print_html_title('SETS')
+        self.se.print_html(count)
+        self._print_html_title('LENGTHS')
+        self.le.print_html(count)
+        self._print_html_title('PATTERNS')
+        self.pa.print_html(count)
+        self._print_html_title('TIME AND PATTERNS', 'FOUND', 'SUBSET SIZE')
+        self.ti.print_html(count)
+        self._print_html_title('BASE WORDS')
+        self.ba.print_html(count)
+        self._print_html_title('MODS')
+        self.mo.print_html(count)
+        self._print_html_title('PREFIXES')
+        self.pr.print_html(count)
+        self._print_html_title('SUFFIXES')
+        self.su.print_html(count)
+        self._print_html_title('OVERALL ENTROPY', 'SCALE', '')
+        try:entropy=float(self.en.total_save)/float(self.en.total)
+        except:extropy=0
+        print '<tr>\n\t<td>%s</td>\n\t<td>%s</td>\n</tr>' % (entropy, 'pattern(0) - random(1)')
+        self._print_html_title('ENTROPY')
+        self.en.print_html(count)
+        self._print_html_title('YEARS')
+        self.ye.print_html(count)
+        self._print_html_title('TOP PASSWORDS')
+        self.to.print_html(count)
+        print '</table>'
+
 
 if __name__ == '__main__':
     if not sys.stdin.isatty():
@@ -92,11 +164,20 @@ if __name__ == '__main__':
             except:pass
             try:count = int(sys.argv[sys.argv.index('--count') +1])
             except:pass
+        if '-w' in sys.argv or '--web' in sys.argv:
+            web = True
     else:
         parse = argparse.ArgumentParser()
         parse.add_argument('file', help="password file")
         parse.add_argument('-c', '--count', default=10, help="# of items to print")
+        parse.add_argument('-w', '--web', action='store_true', help='output in html')
         args = parse.parse_args()
         f = open(args.file, 'r')
         count = int(args.count)
-    run(f, count)
+        web = args.web
+    recognition = Recognition()
+    recognition.run(f, count)
+    if web:
+        recognition.print_html()
+    else:
+        recognition.print_commandline()

@@ -6,8 +6,11 @@ from rec.template import Template
 class Find_Basewords(Template):
     def __init__(self):
         self.total = 0
-        self.d = enchant.DictWithPWL(
-            "en", os.path.dirname(rec.__file__) + '/spell_check.txt')
+        try:
+            self.d = enchant.DictWithPWL(
+                "en", os.path.dirname(rec.__file__) + '/spell_check.txt')
+        except:
+            exit('\n\tsudo is required to read site-packages/recognition/rec/spell_check.txt\n')
         self.save = {}
 
     def parse_word(self, word):

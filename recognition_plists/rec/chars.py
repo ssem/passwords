@@ -17,11 +17,30 @@ class Find_Chars(Template):
             counter += 1
             if counter < count:
                 response += data[0]
-        print 'all: %s\n' % response
         counter = 0
         for data in returned_data:
             counter += 1
             if counter < count:
                 try:percent = round(float(data[1]) / float(self.return_total()) * 100, 2)
                 except:percent = 0
-                print '{:<50}{:<10}{:<10}'.format(data[0], data[1], percent)
+                print '{:<50}{:<10}{:<.2f}%'.format(data[0], data[1], percent)
+
+    def print_html(self, count):
+        counter = 0
+        response = ''
+        returned_data = self.return_data()
+        for data in returned_data:
+            counter += 1
+            if counter < count:
+                response += data[0]
+        counter = 0
+        for data in returned_data:
+            counter += 1
+            if counter < count:
+                try:percent = round(float(data[1]) / float(self.return_total()) * 100, 2)
+                except:percent = 0
+                print '<tr>'
+                print '\t<td>%s</td>' % data[0]
+                print '\t<td>%s</td>' % data[1]
+                print '\t<td>%s</td>' % percent
+                print '</tr>'
